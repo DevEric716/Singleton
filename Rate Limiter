@@ -1,0 +1,30 @@
+--!strict
+-- @class RateLimiter
+-- @description Previne executarea unei funcții prea frecvent, optimizând utilizarea CPU.
+
+export type RateLimiter = {
+    _lastExecution: number,
+    _cooldown: number,
+    execute: (self: RateLimiter, callback: (...any) -> ()) -> ()
+}
+
+local RateLimiter = {}
+RateLimiter.__index = RateLimiter
+
+function RateLimiter.new(cooldown: number): RateLimiter
+    local self = setmetatable({
+        _lastExecution = 0,
+        _cooldown = cooldown
+    }, RateLimiter)
+    return self
+end
+
+function RateLimiter:execute(callback: (...any) -> ()): ()
+    local now = os.clock()
+    if now - self._lastExecution >= self._cooldown then
+        self._lastExecution = now
+        callback()
+    end
+end
+
+return RateLimiter
