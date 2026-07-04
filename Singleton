@@ -1,0 +1,33 @@
+--!strict
+-- @class MemoryManager
+-- @description Exemplu de structură pentru un serviciu modular de gestionare a resurselor.
+
+local MemoryManager = {}
+MemoryManager.__index = MemoryManager
+
+-- Tipărire (Typing) pentru securitate
+export type Resource = {
+    Id: string,
+    Data: any
+}
+
+-- Private state
+local _registry: {[string]: Resource} = {}
+
+function MemoryManager.RegisterResource(id: string, data: any): ()
+    assert(not _registry[id], "Resource deja înregistrat: " .. id)
+    _registry[id] = {Id = id, Data = data}
+    print(`[MemoryManager] Resource {id} inregistrat.`)
+end
+
+function MemoryManager.GetResource(id: string): any?
+    local resource = _registry[id]
+    return resource and resource.Data or nil
+end
+
+function MemoryManager.Cleanup(): ()
+    table.clear(_registry)
+    print("[MemoryManager] Registru curatat.")
+end
+
+return MemoryManager
